@@ -1,0 +1,19 @@
+{% extends 'quizapp/base.html' %}
+{% block title %}Kết quả{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+  <div class="card shadow-sm border-0 text-center"><div class="card-body p-5">
+    <div class="text-secondary">{{ quiz.title }}</div>
+    <h1 class="display-5 fw-bold mt-2">{{ attempt.score }}/{{ attempt.total }}</h1>
+    <p class="lead">{{ attempt.participant_name }} — {{ attempt.percentage }}%</p>
+    <div class="input-group mt-4"><input id="shareUrl" class="form-control" value="{{ share_url }}" readonly><button onclick="copyLink()" class="btn btn-outline-primary">Sao chép link</button></div>
+    <a href="{% url 'take_quiz' quiz.share_code %}" class="btn btn-primary mt-3">Làm lại</a>
+  </div></div>
+</div></div>
+<script>
+function copyLink(){
+ const el=document.getElementById('shareUrl');
+ navigator.clipboard.writeText(el.value).then(()=>alert('Đã sao chép link!'));
+}
+</script>
+{% endblock %}

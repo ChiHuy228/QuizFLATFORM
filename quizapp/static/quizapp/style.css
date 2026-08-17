@@ -1,0 +1,7 @@
+body { background: #f5f7fb; }
+.card { border-radius: 16px; }
+.form-control, .form-control[type=file] { padding: .75rem .9rem; }
+.answer-option { border: 1px solid #e5e7eb; border-radius: 10px; padding: .8rem 1rem; cursor: pointer; background: #fff; }
+.answer-option:hover { background: #f8fafc; }
+.answer-option input { margin-right: .5rem; }
+.sample { background: #111827; color: #f9fafb; border-radius: 12px; padding: 1rem; white-space: pre-wrap; }

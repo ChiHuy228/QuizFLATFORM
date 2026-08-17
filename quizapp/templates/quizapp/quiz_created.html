@@ -1,0 +1,320 @@
+{% extends "quizapp/base.html" %}
+
+{% block title %}
+    Tạo bài thành công
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-lg-8">
+
+        <div class="card shadow-sm border-0">
+
+            <div class="card-body text-center p-5">
+
+
+                <!-- ====================================== -->
+                <!-- ICON -->
+                <!-- ====================================== -->
+
+                <div
+                    class="mb-3"
+                    style="font-size: 55px;"
+                >
+
+                    ✅
+
+                </div>
+
+
+                <!-- ====================================== -->
+                <!-- TIÊU ĐỀ -->
+                <!-- ====================================== -->
+
+                <h1 class="h3 fw-bold mb-3">
+
+                    Tạo bài trắc nghiệm thành công!
+
+                </h1>
+
+
+                <!-- ====================================== -->
+                <!-- TÊN BÀI -->
+                <!-- ====================================== -->
+
+                <p class="text-secondary mb-4">
+
+                    <strong>
+
+                        {{ quiz.title }}
+
+                    </strong>
+
+                </p>
+
+
+                <!-- ====================================== -->
+                <!-- SỐ CÂU -->
+                <!-- ====================================== -->
+
+                <div class="alert alert-success">
+
+                    Bài trắc nghiệm đã được tạo với
+
+                    <strong>
+
+                        {{ quiz.questions.count }} câu hỏi
+
+                    </strong>.
+
+                </div>
+
+
+                <!-- ====================================== -->
+                <!-- LINK -->
+                <!-- ====================================== -->
+
+                <div class="text-start mt-4">
+
+                    <label class="form-label fw-semibold">
+
+                        🔗 Link chia sẻ bài trắc nghiệm
+
+                    </label>
+
+
+                    <div class="input-group">
+
+                        <input
+                            id="shareLink"
+                            type="text"
+                            class="form-control"
+                            value="{{ share_url }}"
+                            readonly
+                        >
+
+
+                        <button
+                            type="button"
+                            id="copyButton"
+                            class="btn btn-primary"
+                            onclick="copyShareLink()"
+                        >
+
+                            Sao chép link
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ====================================== -->
+                <!-- THÔNG BÁO COPY -->
+                <!-- ====================================== -->
+
+                <div
+                    id="copyMessage"
+                    class="text-success mt-3"
+                    style="display:none;"
+                >
+
+                    ✅ Đã sao chép link!
+
+                </div>
+
+
+                <!-- ====================================== -->
+                <!-- NÚT -->
+                <!-- ====================================== -->
+
+                <div
+                    class="d-flex gap-2 justify-content-center mt-4 flex-wrap"
+                >
+
+
+                    <!-- LÀM BÀI THỬ -->
+
+                    <a
+                        href="{% url 'take_quiz' quiz.share_code %}"
+                        class="btn btn-success btn-lg"
+                    >
+
+                        Làm bài thử
+
+                    </a>
+
+
+                    <!-- TẠO BÀI KHÁC -->
+
+                    <a
+                        href="{% url 'home' %}"
+                        class="btn btn-outline-primary btn-lg"
+                    >
+
+                        Tạo bài khác
+
+                    </a>
+
+                </div>
+
+
+                <!-- ====================================== -->
+                <!-- HƯỚNG DẪN -->
+                <!-- ====================================== -->
+
+                <div
+                    class="alert alert-light border mt-4 text-start"
+                >
+
+                    <strong>
+
+                        💡 Bạn có thể:
+
+                    </strong>
+
+
+                    <ul class="mb-0 mt-2">
+
+                        <li>
+
+                            Sao chép link ở trên.
+
+                        </li>
+
+                        <li>
+
+                            Gửi link cho bạn bè.
+
+                        </li>
+
+                        <li>
+
+                            Bạn bè mở link để làm bài.
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================== -->
+<!-- JAVASCRIPT SAO CHÉP LINK -->
+<!-- ============================================== -->
+
+<script>
+
+function copyShareLink() {
+
+    const input =
+        document.getElementById("shareLink");
+
+    const message =
+        document.getElementById("copyMessage");
+
+    const button =
+        document.getElementById("copyButton");
+
+
+    function copied() {
+
+        message.style.display = "block";
+
+        button.textContent =
+            "Đã sao chép!";
+
+
+        setTimeout(function () {
+
+            message.style.display = "none";
+
+            button.textContent =
+                "Sao chép link";
+
+        }, 2000);
+
+    }
+
+
+    // Trình duyệt hiện đại
+
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
+
+        navigator.clipboard
+            .writeText(input.value)
+            .then(copied)
+            .catch(function () {
+
+                fallbackCopy(
+                    input,
+                    copied
+                );
+
+            });
+
+    }
+
+    else {
+
+        fallbackCopy(
+            input,
+            copied
+        );
+
+    }
+
+}
+
+
+function fallbackCopy(
+    input,
+    callback
+) {
+
+    input.focus();
+
+    input.select();
+
+    input.setSelectionRange(
+        0,
+        input.value.length
+    );
+
+
+    try {
+
+        document.execCommand("copy");
+
+        callback();
+
+    }
+
+    catch (error) {
+
+        alert(
+            "Không thể tự sao chép. " +
+            "Bạn hãy bôi đen link và nhấn Ctrl+C."
+        );
+
+    }
+
+}
+
+</script>
+
+{% endblock %}

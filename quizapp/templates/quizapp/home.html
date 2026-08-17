@@ -1,0 +1,35 @@
+{% extends 'quizapp/base.html' %}
+{% block title %}Tạo bài trắc nghiệm{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-md-5">
+        <h1 class="h3 fw-bold mb-2">Tạo bài trắc nghiệm từ Word</h1>
+        <p class="text-secondary">Tải file .docx theo mẫu, hệ thống sẽ tự tách câu hỏi và đáp án rồi tạo link chia sẻ.</p>
+        <form method="post" enctype="multipart/form-data" class="mt-4">
+          {% csrf_token %}
+          <div class="mb-3"><label class="form-label">Tên bài</label>{{ form.title }}</div>
+          <div class="mb-3"><label class="form-label">File Word</label>{{ form.docx_file }}</div>
+          <button class="btn btn-primary btn-lg w-100">Tạo bài trắc nghiệm</button>
+        </form>
+        <hr class="my-4">
+        <h2 class="h5">Mẫu Word bắt buộc</h2>
+<pre class="sample">Câu 1: Thủ đô của Việt Nam là gì?
+A. Hà Nội
+B. Hồ Chí Minh
+C. Đà Nẵng
+D. Hải Phòng
+Đáp án: A
+
+Câu 2: 1 + 1 bằng bao nhiêu?
+A. 1
+B. 2
+C. 3
+D. 4
+Đáp án: B</pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
