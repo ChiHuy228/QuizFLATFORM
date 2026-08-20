@@ -110,11 +110,9 @@ def home(request):
 
     else:
 
-        form = WordUploadForm(
-            initial={
-                "title": "Bài trắc nghiệm mới"
-            }
-        )
+        form = WordUploadForm()
+            
+     
 
     return render(
         request,
