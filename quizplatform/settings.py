@@ -54,6 +54,11 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL")
+
+if RENDER_EXTERNAL_URL:
+    CSRF_TRUSTED_ORIGINS.append(RENDER_EXTERNAL_URL)
+
 
 # =========================================================
 # APPLICATIONS
