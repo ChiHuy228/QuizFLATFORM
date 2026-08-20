@@ -1,167 +1,256 @@
 {% extends "quizapp/base.html" %}
 
+
 {% block title %}
-    {{ quiz.title }}
+    {{ quiz.title }} | Làm bài trắc nghiệm
 {% endblock %}
+
+
+{% block extra_head %}
+
+<meta
+    name="description"
+    content="Làm bài trắc nghiệm {{ quiz.title }} trực tuyến và nhận kết quả sau khi nộp bài."
+>
+
+{% endblock %}
+
 
 {% block content %}
 
-<div class="row justify-content-center">
+<article
+    aria-labelledby="quiz-title"
+>
 
-    <div class="col-lg-9">
+    <header class="mb-4">
 
-        <!-- ========================================== -->
-        <!-- TIÊU ĐỀ -->
-        <!-- ========================================== -->
+        <h1
+            id="quiz-title"
+            class="h3 fw-bold"
+        >
+            {{ quiz.title }}
+        </h1>
 
-        <div class="mb-4">
+        <p class="text-secondary">
 
-            <h1 class="h3 fw-bold">
-                {{ quiz.title }}
-            </h1>
+            Bài trắc nghiệm gồm
 
-            <p class="text-secondary">
-                {{ questions|length }} câu hỏi
-            </p>
+            <strong>
+                {{ questions|length }}
+            </strong>
 
-        </div>
+            câu hỏi.
+
+        </p>
+
+    </header>
 
 
-        <!-- ========================================== -->
-        <!-- FORM -->
-        <!-- ========================================== -->
+    <form
+        method="post"
+        action="{% url 'submit_quiz' quiz.share_code %}"
+        aria-label="Biểu mẫu làm bài trắc nghiệm"
+    >
 
-        <form
-            method="post"
-            action="{% url 'submit_quiz' quiz.share_code %}"
+        {% csrf_token %}
+
+
+        <!-- ======================================== -->
+        <!-- THÔNG TIN NGƯỜI THAM GIA -->
+        <!-- ======================================== -->
+
+        <section
+            class="card shadow-sm border-0 mb-4"
+            aria-labelledby="participant-title"
         >
 
-            {% csrf_token %}
+            <section class="card-body">
+
+                <header>
+
+                    <h2
+                        id="participant-title"
+                        class="h5 fw-bold"
+                    >
+                        Thông tin người làm bài
+                    </h2>
+
+                </header>
 
 
-            <!-- ====================================== -->
-            <!-- HỌ TÊN -->
-            <!-- ====================================== -->
+                <p class="mb-0">
 
-            <div class="card shadow-sm border-0 mb-4">
-
-                <div class="card-body">
-
-                    <label class="form-label fw-semibold">
-
+                    <label
+                        for="participant_name"
+                        class="form-label fw-semibold"
+                    >
                         Họ và tên
-
                     </label>
 
                     <input
+                        id="participant_name"
                         name="participant_name"
+                        type="text"
                         class="form-control"
                         required
                         maxlength="120"
+                        autocomplete="name"
                         placeholder="Nhập tên của bạn"
                     >
 
-                </div>
+                </p>
 
-            </div>
+            </section>
 
-
-            <!-- ====================================== -->
-            <!-- DANH SÁCH CÂU HỎI -->
-            <!-- ====================================== -->
-
-            {% for question in questions %}
-
-            <div class="card shadow-sm border-0 mb-3">
-
-                <div class="card-body">
-
-                    <!-- CÂU HỎI -->
-
-                    <h2 class="h5">
-
-                        Câu {{ forloop.counter }}.
-
-                        {{ question.content }}
-
-                    </h2>
+        </section>
 
 
-                    <!-- ================================= -->
-                    <!-- ĐÁP ÁN ĐÃ ĐƯỢC ĐẢO -->
-                    <!-- ================================= -->
+        <!-- ======================================== -->
+        <!-- DANH SÁCH CÂU HỎI -->
+        <!-- ======================================== -->
 
-                    <div class="mt-3">
+        <section
+            aria-labelledby="questions-title"
+        >
 
-                        {% for answer in question.randomized_answers %}
+            <header class="mb-3">
 
-                        <label class="answer-option d-block mb-2">
+                <h2
+                    id="questions-title"
+                    class="h4 fw-bold"
+                >
+                    Câu hỏi
+                </h2>
 
-                            <input
-                                type="radio"
-                                name="question_{{ question.id }}"
-                                value="{{ answer.id }}"
-                                required
-                            >
-
-                            <span class="fw-semibold">
-
-                                {% if forloop.counter == 1 %}
-
-                                    A.
-
-                                {% elif forloop.counter == 2 %}
-
-                                    B.
-
-                                {% elif forloop.counter == 3 %}
-
-                                    C.
-
-                                {% elif forloop.counter == 4 %}
-
-                                    D.
-
-                                {% else %}
-
-                                    {{ forloop.counter }}.
-
-                                {% endif %}
-
-                            </span>
-
-                            {{ answer.content }}
-
-                        </label>
-
-                        {% endfor %}
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            {% endfor %}
+            </header>
 
 
-            <!-- ====================================== -->
-            <!-- NỘP BÀI -->
-            <!-- ====================================== -->
+            <ol
+                class="list-unstyled"
+            >
+
+                {% for question in questions %}
+
+                <li class="mb-3">
+
+                    <article
+                        class="card shadow-sm border-0"
+                        aria-labelledby="question-{{ question.id }}"
+                    >
+
+                        <section class="card-body">
+
+                            <header>
+
+                                <h3
+                                    id="question-{{ question.id }}"
+                                    class="h5"
+                                >
+
+                                    Câu {{ forloop.counter }}.
+
+                                    {{ question.content }}
+
+                                </h3>
+
+                            </header>
+
+
+                            <fieldset class="mt-3">
+
+                                <legend class="visually-hidden">
+
+                                    Các đáp án của câu
+                                    {{ forloop.counter }}
+
+                                </legend>
+
+
+                                <ul class="list-unstyled mb-0">
+
+                                    {% for answer in question.randomized_answers %}
+
+                                    <li class="mb-2">
+
+                                        <label
+                                            class="answer-option d-block p-2 rounded"
+                                        >
+
+                                            <input
+                                                type="radio"
+                                                name="question_{{ question.id }}"
+                                                value="{{ answer.id }}"
+                                                required
+                                            >
+
+                                            <span class="fw-semibold">
+
+                                                {% if forloop.counter == 1 %}
+                                                    A.
+                                                {% elif forloop.counter == 2 %}
+                                                    B.
+                                                {% elif forloop.counter == 3 %}
+                                                    C.
+                                                {% elif forloop.counter == 4 %}
+                                                    D.
+                                                {% else %}
+                                                    {{ forloop.counter }}.
+                                                {% endif %}
+
+                                            </span>
+
+                                            {{ answer.content }}
+
+                                        </label>
+
+                                    </li>
+
+                                    {% endfor %}
+
+                                </ul>
+
+                            </fieldset>
+
+                        </section>
+
+                    </article>
+
+                </li>
+
+                {% empty %}
+
+                <li>
+
+                    <p class="alert alert-warning">
+                        Bài trắc nghiệm hiện chưa có câu hỏi.
+                    </p>
+
+                </li>
+
+                {% endfor %}
+
+            </ol>
+
+        </section>
+
+
+        <!-- ======================================== -->
+        <!-- NỘP BÀI -->
+        <!-- ======================================== -->
+
+        <footer class="mt-4">
 
             <button
                 type="submit"
                 class="btn btn-success btn-lg w-100"
             >
-
                 Nộp bài
-
             </button>
 
-        </form>
+        </footer>
 
-    </div>
+    </form>
 
-</div>
+</article>
 
 {% endblock %}

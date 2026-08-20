@@ -1,4 +1,30 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Django local database
+db.sqlite3
 *.sqlite3
+
+# Django generated files
+staticfiles/
+media/
+
+# Virtual environments
+venv/
+.venv/
+env/
+myenv/
+
+# IDE
 .vscode/
+.idea/
+
+# Operating system
+.DS_Store
+Thumbs.db

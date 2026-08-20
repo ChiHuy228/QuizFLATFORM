@@ -1,19 +1,430 @@
-{% extends 'quizapp/base.html' %}
-{% block title %}Kết quả{% endblock %}
+{% extends "quizapp/base.html" %}
+
+
+{% block title %}
+    Kết quả | {{ quiz.title }}
+{% endblock %}
+
+
+{% block extra_head %}
+
+<meta
+    name="description"
+    content="Kết quả bài trắc nghiệm {{ quiz.title }} của {{ attempt.participant_name }}."
+>
+
+{% endblock %}
+
+
 {% block content %}
-<div class="row justify-content-center"><div class="col-lg-7">
-  <div class="card shadow-sm border-0 text-center"><div class="card-body p-5">
-    <div class="text-secondary">{{ quiz.title }}</div>
-    <h1 class="display-5 fw-bold mt-2">{{ attempt.score }}/{{ attempt.total }}</h1>
-    <p class="lead">{{ attempt.participant_name }} — {{ attempt.percentage }}%</p>
-    <div class="input-group mt-4"><input id="shareUrl" class="form-control" value="{{ share_url }}" readonly><button onclick="copyLink()" class="btn btn-outline-primary">Sao chép link</button></div>
-    <a href="{% url 'take_quiz' quiz.share_code %}" class="btn btn-primary mt-3">Làm lại</a>
-  </div></div>
-</div></div>
+
+<article
+    class="row justify-content-center"
+    aria-labelledby="result-title"
+>
+
+    <section class="col-lg-7">
+
+        <section class="card shadow-sm border-0">
+
+            <section class="card-body text-center p-4 p-md-5">
+
+
+                <!-- ======================================== -->
+                <!-- TIÊU ĐỀ -->
+                <!-- ======================================== -->
+
+                <header>
+
+                    <p
+                        class="text-secondary mb-2"
+                    >
+                        Kết quả bài trắc nghiệm
+                    </p>
+
+
+                    <h1
+                        id="result-title"
+                        class="h3 fw-bold"
+                    >
+                        {{ quiz.title }}
+                    </h1>
+
+                </header>
+
+
+                <!-- ======================================== -->
+                <!-- NGƯỜI LÀM BÀI -->
+                <!-- ======================================== -->
+
+                <section
+                    class="mt-4"
+                    aria-labelledby="participant-result-title"
+                >
+
+                    <h2
+                        id="participant-result-title"
+                        class="visually-hidden"
+                    >
+                        Thông tin người làm bài
+                    </h2>
+
+
+                    <p class="lead mb-2">
+
+                        <strong>
+                            {{ attempt.participant_name }}
+                        </strong>
+
+                    </p>
+
+                </section>
+
+
+                <!-- ======================================== -->
+                <!-- ĐIỂM SỐ -->
+                <!-- ======================================== -->
+
+                <section
+                    class="mt-3"
+                    aria-labelledby="score-title"
+                >
+
+                    <h2
+                        id="score-title"
+                        class="visually-hidden"
+                    >
+                        Điểm số
+                    </h2>
+
+
+                    <p
+                        class="display-5 fw-bold mb-2"
+                        aria-label="Điểm số {{ attempt.score }} trên {{ attempt.total }}"
+                    >
+
+                        {{ attempt.score }}/{{ attempt.total }}
+
+                    </p>
+
+
+                    <p class="lead text-secondary mb-0">
+
+                        {{ attempt.percentage }}%
+
+                    </p>
+
+                </section>
+
+
+                <!-- ======================================== -->
+                <!-- THÔNG BÁO KẾT QUẢ -->
+                <!-- ======================================== -->
+
+                <section
+                    class="alert alert-success mt-4"
+                    aria-label="Kết quả bài làm"
+                >
+
+                    {% if attempt.percentage >= 80 %}
+
+                        <p class="mb-0 fw-semibold">
+                            🎉 Chúc mừng! Bạn đã hoàn thành bài rất tốt.
+                        </p>
+
+                    {% elif attempt.percentage >= 50 %}
+
+                        <p class="mb-0 fw-semibold">
+                            👍 Bạn đã hoàn thành bài. Hãy cố gắng hơn ở lần sau!
+                        </p>
+
+                    {% else %}
+
+                        <p class="mb-0 fw-semibold">
+                            💪 Hãy ôn tập thêm và thử lại nhé!
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+
+                <!-- ======================================== -->
+                <!-- LINK CHIA SẺ -->
+                <!-- ======================================== -->
+
+                <section
+                    class="text-start mt-4"
+                    aria-labelledby="share-title"
+                >
+
+                    <header>
+
+                        <h2
+                            id="share-title"
+                            class="h5 fw-bold"
+                        >
+                            🔗 Chia sẻ bài trắc nghiệm
+                        </h2>
+
+
+                        <p class="text-secondary">
+
+                            Bạn có thể sao chép link bên dưới
+                            để gửi bài trắc nghiệm cho người khác.
+
+                        </p>
+
+                    </header>
+
+
+                    <form
+                        aria-label="Sao chép link bài trắc nghiệm"
+                        onsubmit="return false;"
+                    >
+
+                        <label
+                            for="shareUrl"
+                            class="visually-hidden"
+                        >
+                            Link bài trắc nghiệm
+                        </label>
+
+
+                        <input
+                            id="shareUrl"
+                            type="url"
+                            class="form-control mb-3"
+                            value="{{ share_url }}"
+                            readonly
+                            aria-describedby="share-description"
+                        >
+
+
+                        <button
+                            type="button"
+                            id="copyButton"
+                            class="btn btn-outline-primary"
+                            onclick="copyLink()"
+                        >
+                            Sao chép link
+                        </button>
+
+
+                        <p
+                            id="share-description"
+                            class="text-secondary small mt-2 mb-0"
+                        >
+                            Gửi link này cho bạn bè để họ có thể
+                            truy cập và làm bài trắc nghiệm.
+                        </p>
+
+                    </form>
+
+
+                    <p
+                        id="copyMessage"
+                        class="text-success mt-3"
+                        role="status"
+                        aria-live="polite"
+                        hidden
+                    >
+                        ✅ Đã sao chép link!
+                    </p>
+
+                </section>
+
+
+                <!-- ======================================== -->
+                <!-- CÁC THAO TÁC -->
+                <!-- ======================================== -->
+
+                <nav
+                    class="mt-4"
+                    aria-label="Các thao tác với bài trắc nghiệm"
+                >
+
+                    <ul
+                        class="list-unstyled d-flex gap-2 justify-content-center flex-wrap mb-0"
+                    >
+
+                        <li>
+
+                            <a
+                                href="{% url 'take_quiz' quiz.share_code %}"
+                                class="btn btn-primary btn-lg"
+                            >
+                                Làm lại
+                            </a>
+
+                        </li>
+
+
+                        <li>
+
+                            <a
+                                href="{% url 'home' %}"
+                                class="btn btn-outline-primary btn-lg"
+                            >
+                                Tạo bài khác
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+
+                <!-- ======================================== -->
+                <!-- HƯỚNG DẪN -->
+                <!-- ======================================== -->
+
+                <aside
+                    class="alert alert-light border mt-4 text-start"
+                    aria-label="Hướng dẫn"
+                >
+
+                    <h2 class="h6 fw-bold">
+                        💡 Bạn có thể làm gì tiếp theo?
+                    </h2>
+
+
+                    <ol class="mb-0">
+
+                        <li>
+                            Nhấn <strong>Làm lại</strong> để thực hiện lại bài.
+                        </li>
+
+                        <li>
+                            Nhấn <strong>Sao chép link</strong> để chia sẻ bài.
+                        </li>
+
+                        <li>
+                            Gửi link cho bạn bè để họ tham gia.
+                        </li>
+
+                    </ol>
+
+                </aside>
+
+            </section>
+
+        </section>
+
+    </section>
+
+</article>
+
+{% endblock %}
+
+
+{% block extra_scripts %}
+
 <script>
-function copyLink(){
- const el=document.getElementById('shareUrl');
- navigator.clipboard.writeText(el.value).then(()=>alert('Đã sao chép link!'));
+
+function copyLink() {
+
+    const input =
+        document.getElementById("shareUrl");
+
+    const button =
+        document.getElementById("copyButton");
+
+    const message =
+        document.getElementById("copyMessage");
+
+
+    function showCopiedMessage() {
+
+        message.hidden = false;
+
+        button.textContent = "Đã sao chép!";
+
+
+        window.setTimeout(function () {
+
+            message.hidden = true;
+
+            button.textContent = "Sao chép link";
+
+        }, 2000);
+
+    }
+
+
+    /*
+     * Trình duyệt hiện đại
+     */
+
+    if (
+        navigator.clipboard &&
+        window.isSecureContext
+    ) {
+
+        navigator.clipboard
+            .writeText(input.value)
+            .then(showCopiedMessage)
+            .catch(function () {
+
+                fallbackCopy(
+                    input,
+                    showCopiedMessage
+                );
+
+            });
+
+        return;
+
+    }
+
+
+    /*
+     * Fallback cho trình duyệt cũ
+     */
+
+    fallbackCopy(
+        input,
+        showCopiedMessage
+    );
+
 }
+
+
+function fallbackCopy(
+    input,
+    callback
+) {
+
+    input.focus();
+
+    input.select();
+
+    input.setSelectionRange(
+        0,
+        input.value.length
+    );
+
+
+    try {
+
+        document.execCommand("copy");
+
+        callback();
+
+    }
+
+    catch (error) {
+
+        window.alert(
+            "Không thể tự động sao chép. " +
+            "Vui lòng chọn link và nhấn Ctrl+C."
+        );
+
+    }
+
+}
+
 </script>
+
 {% endblock %}

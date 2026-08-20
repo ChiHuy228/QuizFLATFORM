@@ -1,20 +1,115 @@
 {% load static %}
+
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Quiz DOCX{% endblock %}</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="{% static 'quizapp/style.css' %}">
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <meta
+        name="description"
+        content="AzulQuiz - Tạo bài trắc nghiệm trực tuyến từ file Word và chia sẻ bài kiểm tra."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
+    <meta
+        name="author"
+        content="AzulQuiz"
+    >
+
+    <link
+        rel="canonical"
+        href="{{ request.build_absolute_uri }}"
+    >
+
+    <title>
+        {% block title %}
+            AzulQuiz - Tạo trắc nghiệm từ Word
+        {% endblock %}
+    </title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'quizapp/style.css' %}"
+    >
+
+    {% block extra_head %}{% endblock %}
 </head>
+
 <body>
-<nav class="navbar navbar-dark bg-dark">
-  <div class="container"><a class="navbar-brand fw-bold" href="{% url 'home' %}">Quiz DOCX</a></div>
-</nav>
+
+<header>
+    <nav
+        class="navbar navbar-dark bg-dark"
+        aria-label="Điều hướng chính"
+    >
+        <div class="container">
+            <a
+                class="navbar-brand d-flex align-items-center gap-2 fw-bold"
+                href="{% url 'home' %}"
+                aria-label="AzulQuiz - Trang chủ"
+            >
+                <img
+                    src="{% static 'quizapp/image/logo.jpg' %}"
+                    alt="Logo AzulQuiz"
+                    class="azulquiz-logo"
+                    width="40"
+                    height="40"
+>
+
+                <span>AzulQuiz</span>
+            </a>
+        </div>
+    </nav>
+</header>
+
+
 <main class="container py-5">
-  {% for message in messages %}<div class="alert alert-danger">{{ message }}</div>{% endfor %}
-  {% block content %}{% endblock %}
+
+    {% if messages %}
+        <section
+            aria-label="Thông báo hệ thống"
+            class="mb-4"
+        >
+            {% for message in messages %}
+                <p
+                    class="alert alert-danger mb-2"
+                    role="alert"
+                >
+                    {{ message }}
+                </p>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
 </main>
+
+
+<footer class="border-top py-4 mt-5">
+    <div class="container text-center">
+        <p class="text-secondary mb-0">
+            AzulQuiz - Tạo và chia sẻ bài trắc nghiệm trực tuyến từ file Word.
+        </p>
+    </div>
+</footer>
+
+
+{% block extra_scripts %}{% endblock %}
+
 </body>
 </html>

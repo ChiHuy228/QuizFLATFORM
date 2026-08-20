@@ -1,21 +1,150 @@
-{% extends 'quizapp/base.html' %}
-{% block title %}Tạo bài trắc nghiệm{% endblock %}
+{% extends "quizapp/base.html" %}
+
+
+{% block title %}
+    AzulQuiz - Tạo bài trắc nghiệm từ Word
+{% endblock %}
+
+
+{% block extra_head %}
+
+<meta
+    name="description"
+    content="Tải file DOCX lên AzulQuiz để tự động tạo bài trắc nghiệm và tạo link chia sẻ cho bạn bè."
+>
+
+{% endblock %}
+
+
 {% block content %}
-<div class="row justify-content-center">
-  <div class="col-lg-8">
-    <div class="card shadow-sm border-0">
-      <div class="card-body p-4 p-md-5">
-        <h1 class="h3 fw-bold mb-2">Tạo bài trắc nghiệm từ Word</h1>
-        <p class="text-secondary">Tải file .docx theo mẫu, hệ thống sẽ tự tách câu hỏi và đáp án rồi tạo link chia sẻ.</p>
-        <form method="post" enctype="multipart/form-data" class="mt-4">
-          {% csrf_token %}
-          <div class="mb-3"><label class="form-label">Tên bài</label>{{ form.title }}</div>
-          <div class="mb-3"><label class="form-label">File Word</label>{{ form.docx_file }}</div>
-          <button class="btn btn-primary btn-lg w-100">Tạo bài trắc nghiệm</button>
-        </form>
-        <hr class="my-4">
-        <h2 class="h5">Mẫu Word bắt buộc</h2>
-<pre class="sample">Câu 1: Thủ đô của Việt Nam là gì?
+
+<header class="text-center mb-5">
+
+    <h1 class="display-6 fw-bold">
+        Tạo bài trắc nghiệm từ Word
+    </h1>
+
+    <p class="lead text-secondary">
+        Tải file DOCX lên, hệ thống sẽ tự động tách câu hỏi,
+        đáp án và tạo bài trắc nghiệm trực tuyến có link chia sẻ.
+    </p>
+
+</header>
+
+
+<section
+    aria-labelledby="quiz-create-title"
+    class="row justify-content-center"
+>
+
+    <article class="col-lg-8">
+
+        <section class="card shadow-sm border-0">
+
+            <section class="card-body p-4 p-md-5">
+
+                <header>
+                    <h2
+                        id="quiz-create-title"
+                        class="h4 fw-bold mb-3"
+                    >
+                        Tạo bài trắc nghiệm mới
+                    </h2>
+                </header>
+
+
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    action="{% url 'home' %}"
+                    aria-label="Biểu mẫu tạo bài trắc nghiệm"
+                >
+
+                    {% csrf_token %}
+
+
+                    <fieldset>
+
+                        <legend class="visually-hidden">
+                            Thông tin bài trắc nghiệm
+                        </legend>
+
+
+                        <p class="mb-3">
+
+                            <label
+                                for="{{ form.title.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                Tên bài
+                            </label>
+
+                            {{ form.title }}
+
+                        </p>
+
+
+                        <p class="mb-4">
+
+                            <label
+                                for="{{ form.docx_file.id_for_label }}"
+                                class="form-label fw-semibold"
+                            >
+                                File Word (.docx)
+                            </label>
+
+                            {{ form.docx_file }}
+
+                            <small class="form-text text-secondary">
+                                Chọn file Word chứa câu hỏi,
+                                các đáp án A, B, C, D và đáp án đúng.
+                            </small>
+
+                        </p>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-lg w-100"
+                        >
+                            Tạo bài trắc nghiệm
+                        </button>
+
+                    </fieldset>
+
+                </form>
+
+            </section>
+
+        </section>
+
+
+        <section
+            aria-labelledby="word-format-title"
+            class="card shadow-sm border-0 mt-4"
+        >
+
+            <section class="card-body p-4">
+
+                <header>
+                    <h2
+                        id="word-format-title"
+                        class="h5 fw-bold"
+                    >
+                        Mẫu file Word
+                    </h2>
+
+                    <p class="text-secondary">
+                        File DOCX nên được trình bày theo cấu trúc dưới đây
+                        để hệ thống có thể bóc tách chính xác.
+                    </p>
+                </header>
+
+
+                <pre
+                    class="sample"
+                    aria-label="Ví dụ định dạng file Word"
+                >Câu 1: Thủ đô của Việt Nam là gì?
 A. Hà Nội
 B. Hồ Chí Minh
 C. Đà Nẵng
@@ -28,8 +157,55 @@ B. 2
 C. 3
 D. 4
 Đáp án: B</pre>
-      </div>
-    </div>
-  </div>
-</div>
+
+            </section>
+
+        </section>
+
+
+        <section
+            aria-labelledby="how-it-works-title"
+            class="mt-5"
+        >
+
+            <header>
+                <h2
+                    id="how-it-works-title"
+                    class="h4 fw-bold"
+                >
+                    Cách tạo bài trắc nghiệm
+                </h2>
+            </header>
+
+
+            <ol class="mt-3">
+
+                <li class="mb-2">
+                    Chuẩn bị file Word chứa câu hỏi và đáp án.
+                </li>
+
+                <li class="mb-2">
+                    Tải file DOCX lên hệ thống.
+                </li>
+
+                <li class="mb-2">
+                    Hệ thống tự động tạo bài trắc nghiệm.
+                </li>
+
+                <li class="mb-2">
+                    Nhận link và chia sẻ cho bạn bè.
+                </li>
+
+                <li>
+                    Người tham gia làm bài và nhận kết quả.
+                </li>
+
+            </ol>
+
+        </section>
+
+    </article>
+
+</section>
+
 {% endblock %}

@@ -1,4 +1,4 @@
-# Quiz DOCX - Django
+# AzulQuiz - Django
 
 Website tạo bài trắc nghiệm từ file Word `.docx` và chia sẻ bằng link.
 
