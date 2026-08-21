@@ -1,0 +1,218 @@
+{% extends "quizapp/base.html" %}
+
+
+{% block title %}
+    Review bài trắc nghiệm | {{ draft.title }}
+{% endblock %}
+
+
+{% block content %}
+
+<header class="review-page-header mb-4">
+    <p class="text-primary fw-semibold mb-2">Bước 2/2 · Review dữ liệu</p>
+    <h1 id="review-title" class="h2 fw-bold mb-2">Review bài trắc nghiệm</h1>
+    <p class="text-secondary mb-0">
+        Đối chiếu dữ liệu đã phân tích và xác nhận đáp án đúng trước khi tạo quiz.
+    </p>
+</header>
+
+
+<form
+    method="post"
+    action="{% url 'quiz_review' %}"
+    aria-labelledby="review-title"
+>
+    {% csrf_token %}
+
+    <section class="row g-4 align-items-stretch review-grid" aria-label="Nội dung review">
+        <article class="col-lg-5 d-flex">
+            <section class="card shadow-sm border-0 review-panel w-100">
+                <header class="card-header bg-white border-0 review-panel__header">
+                    <h2 class="h4 fw-bold mb-1">File Word đã phân tích</h2>
+                    <p class="text-secondary mb-0">
+                        {{ reviewed_questions|length }} câu hỏi · {{ draft.title }}
+                    </p>
+                </header>
+
+                <section
+                    class="card-body review-panel__body"
+                    aria-label="Kết quả phân tích file Word"
+                    tabindex="0"
+                >
+                    <ol class="list-unstyled mb-0">
+                        {% for question in reviewed_questions %}
+                            <li class="mb-3">
+                                <article class="review-question border rounded-3 p-3">
+                                    <header class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                                        <h3 class="h6 fw-bold mb-0">
+                                            Câu {{ question.number }}.
+                                            {{ question.text|default:"(Chưa có nội dung)" }}
+                                        </h3>
+
+                                        {% if question.status == "valid" %}
+                                            <span class="badge text-bg-success review-status">Hợp lệ</span>
+                                        {% elif question.status == "missing_correct_answer" %}
+                                            <span class="badge text-bg-warning review-status">Thiếu đáp án đúng</span>
+                                        {% elif question.status == "conflict_correct_answer" %}
+                                            <span class="badge text-bg-danger review-status">Xung đột đáp án</span>
+                                        {% elif question.status == "missing_answers" %}
+                                            <span class="badge text-bg-danger review-status">Thiếu lựa chọn</span>
+                                        {% else %}
+                                            <span class="badge text-bg-danger review-status">Lỗi cấu trúc</span>
+                                        {% endif %}
+                                    </header>
+
+                                    <ul
+                                        class="list-unstyled mb-0"
+                                        aria-label="Các lựa chọn của câu {{ question.number }}"
+                                    >
+                                        {% for answer in question.answers %}
+                                            <li class="parsed-answer py-1{% if answer.key == question.correct_key %} text-success fw-semibold{% endif %}">
+                                                <strong>{{ answer.key }}.</strong>
+                                                {{ answer.text|default:"(Chưa có nội dung)" }}
+
+                                                {% if answer.key == question.correct_key %}
+                                                    <span aria-hidden="true">✓</span>
+                                                    <span class="visually-hidden">Parser nhận diện là đáp án đúng</span>
+                                                {% endif %}
+                                            </li>
+                                        {% empty %}
+                                            <li class="text-danger">Không nhận diện được lựa chọn nào.</li>
+                                        {% endfor %}
+                                    </ul>
+
+                                    {% if question.issues %}
+                                        <aside class="review-issues mt-3" aria-label="Vấn đề parser phát hiện">
+                                            <p class="small fw-semibold mb-1">Cần kiểm tra:</p>
+                                            <ul class="small mb-0 ps-3">
+                                                {% for issue in question.issues %}
+                                                    <li>{{ issue }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </aside>
+                                    {% endif %}
+                                </article>
+                            </li>
+                        {% empty %}
+                            <li class="alert alert-danger mb-0" role="alert">
+                                Không có câu hỏi để review.
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </section>
+            </section>
+        </article>
+
+        <article class="col-lg-7 d-flex">
+            <section class="card shadow-sm border-0 review-panel w-100">
+                <header class="card-header bg-white border-0 review-panel__header">
+                    <h2 class="h4 fw-bold mb-1">Bản review đáp án đúng</h2>
+                    <p class="text-secondary mb-0">
+                        Mỗi câu phải có đúng một đáp án được chọn.
+                    </p>
+                </header>
+
+                <section
+                    class="card-body review-panel__body"
+                    aria-label="Form chọn đáp án đúng"
+                    tabindex="0"
+                >
+                    <ol class="list-unstyled mb-0">
+                        {% for question in reviewed_questions %}
+                            <li class="mb-3">
+                                <fieldset class="review-question border rounded-3 p-3">
+                                    <legend class="h6 fw-bold float-none w-100 mb-2">
+                                        Câu {{ forloop.counter }}.
+                                        {{ question.text|default:"(Chưa có nội dung)" }}
+                                    </legend>
+
+                                    {% if question.status == "missing_correct_answer" %}
+                                        <p class="alert alert-warning py-2 small" role="alert">
+                                            Parser chưa tìm thấy đáp án đúng. Hãy chọn một lựa chọn bên dưới.
+                                        </p>
+                                    {% elif question.status == "conflict_correct_answer" %}
+                                        <p class="alert alert-danger py-2 small" role="alert">
+                                            Các dấu hiệu đáp án đúng đang mâu thuẫn. Hãy xác nhận lại một lựa chọn.
+                                        </p>
+                                    {% elif question.status == "missing_answers" %}
+                                        <p class="alert alert-danger py-2 small" role="alert">
+                                            Câu hỏi chưa có đủ lựa chọn để tạo quiz.
+                                        </p>
+                                    {% elif question.status == "invalid_question" %}
+                                        <p class="alert alert-danger py-2 small" role="alert">
+                                            Cấu trúc câu hỏi chưa hợp lệ. Hãy kiểm tra các lỗi parser ở cột trái.
+                                        </p>
+                                    {% elif question.correct_key %}
+                                        <p class="small text-success mb-2">
+                                            Parser đã chọn {{ question.correct_key }}. Bạn vẫn có thể thay đổi.
+                                        </p>
+                                    {% endif %}
+
+                                    <ul
+                                        class="list-unstyled mb-0"
+                                        aria-label="Đáp án đúng của câu {{ forloop.counter }}"
+                                    >
+                                        {% for answer in question.answers %}
+                                            <li class="mb-2">
+                                                <label
+                                                    for="review-question-{{ forloop.parentloop.counter0 }}-{{ answer.key }}"
+                                                    class="answer-option review-answer d-flex align-items-start"
+                                                >
+                                                    <input
+                                                        id="review-question-{{ forloop.parentloop.counter0 }}-{{ answer.key }}"
+                                                        class="form-check-input flex-shrink-0"
+                                                        type="radio"
+                                                        name="{{ question.field_name }}"
+                                                        value="{{ answer.key }}"
+                                                        {% if answer.key == question.selected_key %}checked{% endif %}
+                                                        required
+                                                    >
+
+                                                    <span>
+                                                        <strong>{{ answer.key }}.</strong>
+                                                        {{ answer.text|default:"(Chưa có nội dung)" }}
+                                                    </span>
+                                                </label>
+                                            </li>
+                                        {% empty %}
+                                            <li class="text-danger small">
+                                                Không có lựa chọn để xác nhận đáp án đúng.
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+
+                                    {% if request.method == "POST" and question.errors %}
+                                        <aside class="review-errors mt-2" role="alert" aria-label="Lỗi câu hỏi">
+                                            <ul class="text-danger small mb-0 ps-3">
+                                                {% for error in question.errors %}
+                                                    <li>{{ error }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </aside>
+                                    {% endif %}
+                                </fieldset>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </section>
+            </section>
+        </article>
+    </section>
+
+    <footer class="review-actions border rounded-3 bg-white shadow-sm p-3 mt-4">
+        <p class="small text-secondary mb-2">
+            Quiz chỉ được lưu sau khi toàn bộ câu hỏi vượt qua validation phía server.
+        </p>
+
+        <nav class="d-flex flex-column flex-sm-row gap-2" aria-label="Thao tác review">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                Tải file khác
+            </a>
+            <button type="submit" class="btn btn-primary flex-grow-1">
+                Tạo bài trắc nghiệm
+            </button>
+        </nav>
+    </footer>
+</form>
+
+{% endblock %}

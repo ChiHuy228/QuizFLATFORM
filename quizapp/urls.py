@@ -15,6 +15,12 @@ urlpatterns = [
         name="home"
     ),
 
+    path(
+        "quiz/review/",
+        views.quiz_review,
+        name="quiz_review"
+    ),
+
     # ==================================================
     # TRANG SAU KHI TẠO QUIZ
     # ==================================================

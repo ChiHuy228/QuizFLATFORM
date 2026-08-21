@@ -11,3 +11,84 @@ body { background: #f5f7fb; }
     height: 40px;
     object-fit: contain;
 }
+
+.review-panel {
+    overflow: hidden;
+}
+
+.review-panel__header {
+    padding: 1.5rem 1.5rem 1rem;
+}
+
+.review-panel__body {
+    min-height: 0;
+    padding-top: .5rem;
+}
+
+.review-panel__body:focus-visible {
+    outline: 3px solid rgba(13, 110, 253, .25);
+    outline-offset: -3px;
+}
+
+.review-question {
+    background: #fff;
+}
+
+.review-status {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.review-issues {
+    padding: .75rem;
+    color: #664d03;
+    background: #fff3cd;
+    border: 1px solid #ffecb5;
+    border-radius: 10px;
+}
+
+.review-answer {
+    gap: .25rem;
+    margin: 0;
+    transition: border-color .15s ease, background-color .15s ease;
+}
+
+.review-answer:focus-within {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 .2rem rgba(13, 110, 253, .15);
+}
+
+.review-answer .form-check-input {
+    margin-top: .2rem;
+}
+
+@media (min-width: 992px) {
+    .review-panel {
+        height: calc(100vh - 16rem);
+        min-height: 34rem;
+        max-height: 50rem;
+    }
+
+    .review-panel__body {
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+    }
+
+    .review-actions {
+        position: sticky;
+        bottom: .75rem;
+        z-index: 10;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .review-panel {
+        height: auto;
+        overflow: visible;
+    }
+
+    .review-panel__body {
+        overflow: visible;
+    }
+}

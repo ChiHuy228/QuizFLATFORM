@@ -1,6 +1,8 @@
 @echo off
 setlocal
 
+set "DJANGO_SETTINGS_MODULE=quizplatform.settings"
+
 title AzulQuiz Server
 
 echo.

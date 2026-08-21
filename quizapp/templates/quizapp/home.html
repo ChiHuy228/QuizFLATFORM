@@ -26,7 +26,7 @@
 
     <p class="lead text-secondary">
         Tải file DOCX lên, hệ thống sẽ tự động tách câu hỏi,
-        đáp án và tạo bài trắc nghiệm trực tuyến có link chia sẻ.
+        sau đó cho bạn review trước khi tạo link chia sẻ.
     </p>
 
 </header>
@@ -79,7 +79,8 @@
                                 for="{{ form.title.id_for_label }}"
                                 class="form-label fw-semibold"
                             >
-                               
+                                Tên bài trắc nghiệm
+                            </label>
 
                             {{ form.title }}
 
@@ -109,7 +110,7 @@
                             type="submit"
                             class="btn btn-primary btn-lg w-100"
                         >
-                            Tạo bài trắc nghiệm
+                            Phân tích và xem lại
                         </button>
 
                     </fieldset>
@@ -191,7 +192,11 @@ D. 4
                 </li>
 
                 <li class="mb-2">
-                    Hệ thống tự động tạo bài trắc nghiệm.
+                    Review dữ liệu và xác nhận đáp án đúng.
+                </li>
+
+                <li class="mb-2">
+                    Tạo bài trắc nghiệm sau khi dữ liệu hợp lệ.
                 </li>
 
                 <li class="mb-2">
