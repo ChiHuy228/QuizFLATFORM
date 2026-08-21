@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from docx import Document
 
-from quizapp.models import Answer, Attempt, Question, Quiz
+from quizapp.models import Answer, Attempt, AttemptResponse, Question, Quiz
 from quizapp.views import QUIZ_DRAFT_SESSION_KEY
 
 
@@ -156,6 +156,10 @@ class AzulQuizFullRegressionTests(TestCase):
         self.assertEqual(attempt.participant_name, "Người kiểm thử")
         self.assertEqual(attempt.score, 1)
         self.assertEqual(attempt.total, 1)
+        response = AttemptResponse.objects.get(attempt=attempt)
+        self.assertEqual(response.question, question)
+        self.assertEqual(response.selected_answer, correct_answer)
+        self.assertTrue(response.is_correct)
         result_url = reverse(
             "result",
             kwargs={
@@ -173,4 +177,123 @@ class AzulQuizFullRegressionTests(TestCase):
         self.assertContains(result_response, "Người kiểm thử")
         self.assertContains(result_response, "1/1")
         self.assertContains(result_response, "100,0%")
+        self.assertContains(result_response, "Chi tiết bài làm")
+        self.assertContains(result_response, "Bạn đã chọn")
+        self.assertContains(result_response, "Đáp án đúng")
+        self.assertContains(result_response, "Đúng")
         self.assertContains(result_response, expected_share_url)
+
+    def test_result_shows_wrong_and_unanswered_questions(self):
+        quiz = Quiz.objects.create(title="Đề xem lại đáp án")
+        first_question = Question.objects.create(
+            quiz=quiz,
+            content="Hai cộng hai bằng mấy?",
+            order=1,
+        )
+        first_wrong = Answer.objects.create(
+            question=first_question,
+            label="A",
+            content="Ba",
+            is_correct=False,
+            order=1,
+        )
+        Answer.objects.create(
+            question=first_question,
+            label="B",
+            content="Bốn",
+            is_correct=True,
+            order=2,
+        )
+
+        second_question = Question.objects.create(
+            quiz=quiz,
+            content="Màu lá cây thường là gì?",
+            order=2,
+        )
+        Answer.objects.create(
+            question=second_question,
+            label="A",
+            content="Xanh lá",
+            is_correct=True,
+            order=1,
+        )
+        Answer.objects.create(
+            question=second_question,
+            label="B",
+            content="Tím",
+            is_correct=False,
+            order=2,
+        )
+
+        submit_response = self.client.post(
+            reverse("submit_quiz", kwargs={"share_code": quiz.share_code}),
+            {
+                "participant_name": "Người xem chi tiết",
+                f"question_{first_question.id}": str(first_wrong.id),
+            },
+        )
+
+        attempt = Attempt.objects.get(quiz=quiz)
+        self.assertEqual(attempt.score, 0)
+        self.assertEqual(attempt.total, 2)
+
+        responses = list(
+            attempt.responses.order_by("question__order")
+        )
+        self.assertEqual(len(responses), 2)
+        self.assertEqual(responses[0].selected_answer, first_wrong)
+        self.assertFalse(responses[0].is_correct)
+        self.assertIsNone(responses[1].selected_answer)
+        self.assertFalse(responses[1].is_correct)
+
+        result_url = reverse(
+            "result",
+            kwargs={
+                "share_code": quiz.share_code,
+                "attempt_id": attempt.id,
+            },
+        )
+        self.assertRedirects(
+            submit_response,
+            result_url,
+            fetch_redirect_response=False,
+        )
+
+        result_response = self.client.get(result_url)
+        self.assertContains(result_response, "Hai cộng hai bằng mấy?")
+        self.assertContains(result_response, "Màu lá cây thường là gì?")
+        self.assertContains(result_response, "Ba")
+        self.assertContains(result_response, "Bốn")
+        self.assertContains(result_response, "Xanh lá")
+        self.assertContains(result_response, "Bạn đã chọn")
+        self.assertContains(result_response, "Đáp án đúng", count=2)
+        self.assertContains(result_response, "Sai", count=2)
+        self.assertContains(
+            result_response,
+            "Bạn chưa chọn đáp án cho câu này.",
+        )
+
+    def test_old_attempt_without_responses_keeps_summary_page_compatible(self):
+        quiz = Quiz.objects.create(title="Đề cũ")
+        attempt = Attempt.objects.create(
+            quiz=quiz,
+            participant_name="Người làm cũ",
+            score=1,
+            total=1,
+        )
+
+        response = self.client.get(
+            reverse(
+                "result",
+                kwargs={
+                    "share_code": quiz.share_code,
+                    "attempt_id": attempt.id,
+                },
+            )
+        )
+
+        self.assertContains(response, "1/1")
+        self.assertContains(
+            response,
+            "Lượt làm này được tạo trước khi tính năng xem chi tiết",
+        )

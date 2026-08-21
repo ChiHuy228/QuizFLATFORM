@@ -23,7 +23,7 @@
     aria-labelledby="result-title"
 >
 
-    <section class="col-lg-7">
+    <section class="col-lg-10 col-xl-9">
 
         <section class="card shadow-sm border-0">
 
@@ -309,6 +309,142 @@
                 </aside>
 
             </section>
+
+        </section>
+
+
+        <!-- ======================================== -->
+        <!-- CHI TIẾT ĐÁP ÁN -->
+        <!-- ======================================== -->
+
+        <section
+            class="mt-4"
+            aria-labelledby="answer-review-title"
+        >
+
+            <header class="mb-3">
+
+                <h2
+                    id="answer-review-title"
+                    class="h4 fw-bold"
+                >
+                    Chi tiết bài làm
+                </h2>
+
+                <p class="text-secondary mb-0">
+                    Xem lại đáp án đã chọn và đáp án đúng của từng câu.
+                </p>
+
+            </header>
+
+
+            {% if response_details %}
+
+                <ol class="list-unstyled mb-0">
+
+                    {% for response in response_details %}
+
+                        <li class="mb-3">
+
+                            <article
+                                class="card result-question-card shadow-sm border-2 {% if response.is_correct %}border-success{% else %}border-danger{% endif %}"
+                                aria-labelledby="result-question-{{ response.question.id }}"
+                            >
+
+                                <section class="card-body p-3 p-md-4">
+
+                                    <header class="d-flex align-items-start justify-content-between gap-3 mb-3">
+
+                                        <h3
+                                            id="result-question-{{ response.question.id }}"
+                                            class="h5 mb-0"
+                                        >
+                                            Câu {{ forloop.counter }}.
+                                            {{ response.question.content }}
+                                        </h3>
+
+                                        {% if response.is_correct %}
+
+                                            <span class="badge text-bg-success result-question-status">
+                                                Đúng
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge text-bg-danger result-question-status">
+                                                Sai
+                                            </span>
+
+                                        {% endif %}
+
+                                    </header>
+
+
+                                    {% if not response.selected_answer %}
+
+                                        <p class="alert alert-warning py-2 mb-3">
+                                            Bạn chưa chọn đáp án cho câu này.
+                                        </p>
+
+                                    {% endif %}
+
+
+                                    <ul class="list-group result-answer-list">
+
+                                        {% for row in response.answer_rows %}
+
+                                            <li
+                                                class="list-group-item result-answer-row d-flex align-items-start justify-content-between gap-3 {% if row.is_correct %}result-answer-row--correct{% elif row.is_selected %}result-answer-row--incorrect{% endif %}"
+                                            >
+
+                                                <span>
+                                                    {{ row.answer.content }}
+                                                </span>
+
+                                                <span class="d-flex flex-wrap justify-content-end gap-1">
+
+                                                    {% if row.is_selected %}
+
+                                                        <span class="badge {% if row.is_correct %}text-bg-success{% else %}text-bg-danger{% endif %}">
+                                                            Bạn đã chọn
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                    {% if row.is_correct %}
+
+                                                        <span class="badge text-bg-success">
+                                                            Đáp án đúng
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                </span>
+
+                                            </li>
+
+                                        {% endfor %}
+
+                                    </ul>
+
+                                </section>
+
+                            </article>
+
+                        </li>
+
+                    {% endfor %}
+
+                </ol>
+
+            {% else %}
+
+                <p class="alert alert-info mb-0">
+                    Lượt làm này được tạo trước khi tính năng xem chi tiết
+                    đáp án được cập nhật nên chỉ có thông tin tổng điểm.
+                </p>
+
+            {% endif %}
 
         </section>
 

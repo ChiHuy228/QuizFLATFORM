@@ -9,10 +9,10 @@
 {% block content %}
 
 <header class="review-page-header mb-4">
-    <p class="text-primary fw-semibold mb-2">Bước 2/2 · Review dữ liệu</p>
-    <h1 id="review-title" class="h2 fw-bold mb-2">Review bài trắc nghiệm</h1>
+    <p class="text-primary fw-semibold mb-2">Kiểm tra & dữ liệu</p>
+    <h1 id="review-title" class="h2 fw-bold mb-2">XEM LẠI BÀI TRẮC NGHIỆM</h1>
     <p class="text-secondary mb-0">
-        Đối chiếu dữ liệu đã phân tích và xác nhận đáp án đúng trước khi tạo quiz.
+        Kiểm tra nội dung đã phân tích và xác nhận đáp án đúng trước khi tạo bài trắc nghiệm.
     </p>
 </header>
 
@@ -52,7 +52,7 @@
                                         {% if question.status == "valid" %}
                                             <span class="badge text-bg-success review-status">Hợp lệ</span>
                                         {% elif question.status == "missing_correct_answer" %}
-                                            <span class="badge text-bg-warning review-status">Thiếu đáp án đúng</span>
+                                            <span class="badge text-bg-warning review-status">Vui lòng chọn đáp án đúng</span>
                                         {% elif question.status == "conflict_correct_answer" %}
                                             <span class="badge text-bg-danger review-status">Xung đột đáp án</span>
                                         {% elif question.status == "missing_answers" %}
@@ -73,7 +73,7 @@
 
                                                 {% if answer.key == question.correct_key %}
                                                     <span aria-hidden="true">✓</span>
-                                                    <span class="visually-hidden">Parser nhận diện là đáp án đúng</span>
+                                                    <span class="visually-hidden">AzulQuiz nhận diện là đáp án đúng</span>
                                                 {% endif %}
                                             </li>
                                         {% empty %}
@@ -95,7 +95,7 @@
                             </li>
                         {% empty %}
                             <li class="alert alert-danger mb-0" role="alert">
-                                Không có câu hỏi để review.
+                                Không có câu hỏi để kiểm tra.
                             </li>
                         {% endfor %}
                     </ol>
@@ -106,9 +106,9 @@
         <article class="col-lg-7 d-flex">
             <section class="card shadow-sm border-0 review-panel w-100">
                 <header class="card-header bg-white border-0 review-panel__header">
-                    <h2 class="h4 fw-bold mb-1">Bản review đáp án đúng</h2>
+                    <h2 class="h4 fw-bold mb-1">Kiểm tra & hoàn thiện đáp án</h2>
                     <p class="text-secondary mb-0">
-                        Mỗi câu phải có đúng một đáp án được chọn.
+                        Vui lòng kiểm tra và chọn một đáp án đúng cho mỗi câu.
                     </p>
                 </header>
 
@@ -128,7 +128,7 @@
 
                                     {% if question.status == "missing_correct_answer" %}
                                         <p class="alert alert-warning py-2 small" role="alert">
-                                            Parser chưa tìm thấy đáp án đúng. Hãy chọn một lựa chọn bên dưới.
+                                            AzulQuiz chưa tìm thấy đáp án đúng. Hãy chọn một lựa chọn bên dưới.
                                         </p>
                                     {% elif question.status == "conflict_correct_answer" %}
                                         <p class="alert alert-danger py-2 small" role="alert">
@@ -140,11 +140,11 @@
                                         </p>
                                     {% elif question.status == "invalid_question" %}
                                         <p class="alert alert-danger py-2 small" role="alert">
-                                            Cấu trúc câu hỏi chưa hợp lệ. Hãy kiểm tra các lỗi parser ở cột trái.
+                                            Nội dung câu hỏi chưa đúng cấu trúc. Vui lòng kiểm tra lại phần nội dung Word đã phân tích.
                                         </p>
                                     {% elif question.correct_key %}
                                         <p class="small text-success mb-2">
-                                            Parser đã chọn {{ question.correct_key }}. Bạn vẫn có thể thay đổi.
+                                            AzulQuiz đã nhận diện đáp án {{ question.correct_key }}. Bạn có thể chọn lại nếu cần thay đổi đáp án.
                                         </p>
                                     {% endif %}
 
@@ -201,7 +201,7 @@
 
     <footer class="review-actions border rounded-3 bg-white shadow-sm p-3 mt-4">
         <p class="small text-secondary mb-2">
-            Quiz chỉ được lưu sau khi toàn bộ câu hỏi vượt qua validation phía server.
+            Quiz chỉ tạo bài trắc nghiệm khi tất cả câu hỏi đã đầy đủ và hợp lệ.
         </p>
 
         <nav class="d-flex flex-column flex-sm-row gap-2" aria-label="Thao tác review">

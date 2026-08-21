@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from .forms import WordUploadForm
-from .models import Answer, Attempt, Question, Quiz
+from .models import Answer, Attempt, AttemptResponse, Question, Quiz
 from .parser import ANSWER_KEYS, parse_docx
 
 
@@ -442,6 +442,7 @@ def submit_quiz(request, share_code):
     )
 
     score = 0
+    response_data = []
 
     # ==========================================
     # CHẤM ĐIỂM
@@ -453,38 +454,78 @@ def submit_quiz(request, share_code):
             f"question_{question.id}"
         )
 
-        if not selected_answer_id:
-            continue
+        selected_answer = None
 
-        try:
+        if selected_answer_id:
 
-            selected_answer = question.answers.get(
-                id=int(
+            try:
+
+                selected_answer_id = int(
                     selected_answer_id
                 )
+
+            except (
+                ValueError,
+                TypeError
+            ):
+
+                selected_answer_id = None
+
+            if selected_answer_id is not None:
+
+                selected_answer = next(
+                    (
+                        answer
+                        for answer in question.answers.all()
+                        if answer.id == selected_answer_id
+                    ),
+                    None,
+                )
+
+        is_correct = bool(
+            selected_answer
+            and selected_answer.is_correct
+        )
+
+        if is_correct:
+            score += 1
+
+        response_data.append(
+            (
+                question,
+                selected_answer,
+                is_correct,
             )
-
-            if selected_answer.is_correct:
-                score += 1
-
-        except (
-            Answer.DoesNotExist,
-            ValueError,
-            TypeError
-        ):
-
-            continue
+        )
 
     # ==========================================
     # LƯU KẾT QUẢ
     # ==========================================
 
-    attempt = Attempt.objects.create(
-        quiz=quiz,
-        participant_name=name[:120],
-        score=score,
-        total=len(questions),
-    )
+    with transaction.atomic():
+
+        attempt = Attempt.objects.create(
+            quiz=quiz,
+            participant_name=name[:120],
+            score=score,
+            total=len(questions),
+        )
+
+        AttemptResponse.objects.bulk_create(
+            [
+                AttemptResponse(
+                    attempt=attempt,
+                    question=question,
+                    selected_answer=selected_answer,
+                    is_correct=is_correct,
+                )
+                for (
+                    question,
+                    selected_answer,
+                    is_correct,
+                ) in response_data
+            ]
+        )
 
     return redirect(
         "result",
@@ -510,6 +551,32 @@ def result(request, share_code, attempt_id):
         quiz=quiz
     )
 
+    response_details = list(
+        attempt.responses.select_related(
+            "question",
+            "selected_answer",
+        ).prefetch_related(
+            "question__answers"
+        ).order_by(
+            "question__order",
+            "question_id",
+        )
+    )
+
+    for response in response_details:
+
+        response.answer_rows = [
+            {
+                "answer": answer,
+                "is_selected": (
+                    answer.id
+                    == response.selected_answer_id
+                ),
+                "is_correct": answer.is_correct,
+            }
+            for answer in response.question.answers.all()
+        ]
+
     share_url = request.build_absolute_uri(
         reverse(
             "take_quiz",
@@ -527,6 +594,7 @@ def result(request, share_code, attempt_id):
         {
             "quiz": quiz,
             "attempt": attempt,
+            "response_details": response_details,
             "share_url": share_url,
         }
     )

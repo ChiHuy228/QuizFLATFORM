@@ -37,3 +37,32 @@ class Attempt(models.Model):
     @property
     def percentage(self):
         return round(self.score / self.total * 100, 1) if self.total else 0
+
+
+class AttemptResponse(models.Model):
+    attempt = models.ForeignKey(
+        Attempt,
+        on_delete=models.CASCADE,
+        related_name="responses",
+    )
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name="attempt_responses",
+    )
+    selected_answer = models.ForeignKey(
+        Answer,
+        on_delete=models.SET_NULL,
+        related_name="attempt_selections",
+        null=True,
+        blank=True,
+    )
+    is_correct = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["attempt", "question"],
+                name="unique_attempt_question_response",
+            )
+        ]
